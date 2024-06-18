@@ -1,16 +1,27 @@
 cmake_minimum_required(VERSION 3.17)
 project(voxblox
-        VERSION 1.0.0
-        DESCRIPTION "Voxblox Library"
-        LANGUAGES CXX
+    VERSION 1.0.0
+    DESCRIPTION "Voxblox Library"
+    LANGUAGES CXX
 )
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
-find_package(Boost REQUIRED COMPONENTS system)
-find_package(Eigen3 REQUIRED)
+if (NOT TARGET Boost)
+    find_package(Boost REQUIRED COMPONENTS system)
+endif()
+find_package(Eigen3 REQUIRED CONFIG)
+if (NOT TARGET Eigen3::Eigen)
+    # workaround: the official Eigen uses the Eigen3::Eigen target name but the aimotive fork use ::Eigen3
+    set_target_properties(::Eigen3 PROPERTIES IMPORTED_GLOBAL TRUE)
+    add_library(Eigen3::Eigen ALIAS ::Eigen3)
+endif()
 find_package(OpenMP REQUIRED)
-find_package(Protobuf REQUIRED)
-find_package(PCL REQUIRED COMPONENTS common io)
+if (NOT TARGET Protobuf)
+    find_package(Protobuf REQUIRED)
+endif()
+if(NOT TARGET PCL)
+    find_package(PCL REQUIRED COMPONENTS common io)
+endif()
 find_package(Threads REQUIRED)
 set(CMAKE_BUILD_TYPE Release)
 set(CMAKE_MACOSX_RPATH 0)
@@ -27,8 +38,6 @@ set(PROTOBUF_COMPILE_PYTHON true)
 protobuf_generate_cpp(PROTO_SRCS PROTO_HDRS ${PROTO_DEFNS})
 add_library(${PROJECT_NAME}_proto ${PROTO_SRCS})
 target_link_libraries(${PROJECT_NAME}_proto ${PROTOBUF_LIBRARIES})
-
-include_directories(${CMAKE_SOURCE_DIR}/build)
 
 # Add voxblox library
 set(${PROJECT_NAME}_SRCS
@@ -57,15 +66,12 @@ set(${PROJECT_NAME}_SRCS
 
 add_library(${PROJECT_NAME} ${${PROJECT_NAME}_SRCS})
 target_include_directories(${PROJECT_NAME} PUBLIC
-  $<INSTALL_INTERFACE:include>
-  $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
-  ${Boost_INCLUDE_DIRS}
-  ${Eigen3_INCLUDE_DIRS}
-  ${PCL_INCLUDE_DIRS}
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src>
+  $<INSTALL_INTERFACE:include/${PROJECT_NAME}>
 )
-target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_BINARY_DIR})
 
-target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES} ${Boost_LIBRARIES} ${Eigen3_LIBRARIES} ${PCL_LIBRARIES} ${PROTOBUF_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
+target_link_libraries(${PROJECT_NAME} ${Boost_LIBRARIES} Eigen3::Eigen ${PCL_LIBRARIES} ${PROTOBUF_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
 target_link_libraries(${PROJECT_NAME} ${PROJECT_NAME}_proto)
 
 
@@ -84,7 +90,6 @@ INSTALL(EXPORT voxbloxTargets
 	NAMESPACE voxblox::
 	DESTINATION lib/cmake/${PROJECT_NAME}
 )
-export(EXPORT voxbloxTargets NAMESPACE voxblox::)
 
 include(CMakePackageConfigHelpers)
 configure_package_config_file(

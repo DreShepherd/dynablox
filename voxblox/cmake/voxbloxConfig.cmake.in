@@ -1,4 +1,10 @@
 @PACKAGE_INIT@
+find_package(Eigen3 REQUIRED CONFIG)
+if (NOT TARGET Eigen3::Eigen)
+    # workaround: the official Eigen uses the Eigen3::Eigen target name but the aimotive fork use ::Eigen3
+    set_target_properties(::Eigen3 PROPERTIES IMPORTED_GLOBAL TRUE)
+    add_library(Eigen3::Eigen ALIAS ::Eigen3)
+endif()
 
 include("${CMAKE_CURRENT_LIST_DIR}/voxbloxTargets.cmake")
 check_required_components("voxblox")
