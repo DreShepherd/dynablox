@@ -7,7 +7,7 @@
 #include <memory>
 #include <vector>
 
-#include "voxblox/Block.pb.h"
+#include "Block.pb.h"
 #include "voxblox/core/common.h"
 
 namespace voxblox {

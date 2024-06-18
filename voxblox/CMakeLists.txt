@@ -34,10 +34,7 @@ set(PROTO_DEFNS proto/voxblox/Block.proto
                 proto/voxblox/Layer.proto)
 set(BASE_PATH "proto")
 set(PROTOBUF_COMPILE_PYTHON true)
-
 protobuf_generate_cpp(PROTO_SRCS PROTO_HDRS ${PROTO_DEFNS})
-add_library(${PROJECT_NAME}_proto ${PROTO_SRCS})
-target_link_libraries(${PROJECT_NAME}_proto ${PROTOBUF_LIBRARIES})
 
 # Add voxblox library
 set(${PROJECT_NAME}_SRCS
@@ -64,21 +61,20 @@ set(${PROJECT_NAME}_SRCS
   src/utils/voxel_utils.cc
 )
 
-add_library(${PROJECT_NAME} ${${PROJECT_NAME}_SRCS})
+add_library(${PROJECT_NAME} ${${PROJECT_NAME}_SRCS} ${PROTO_SRCS} ${PROTO_HDRS})
 target_include_directories(${PROJECT_NAME} PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/>
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src>
   $<INSTALL_INTERFACE:include/${PROJECT_NAME}>
 )
 
-target_link_libraries(${PROJECT_NAME} ${Boost_LIBRARIES} Eigen3::Eigen ${PCL_LIBRARIES} ${PROTOBUF_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
-target_link_libraries(${PROJECT_NAME} ${PROJECT_NAME}_proto)
-
+target_link_libraries(${PROJECT_NAME} ${Boost_LIBRARIES} Eigen3::Eigen  ${PCL_LIBRARIES} ${PROTOBUF_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
 
 # IDEs should put the headers in a nice place
 source_group(TREE "${PROJECT_SOURCE_DIR}/include" PREFIX "Header Files" FILES ${HEADER_LIST})
 
-install(TARGETS ${PROJECT_NAME} ${PROJECT_NAME}_proto
+install(TARGETS ${PROJECT_NAME}
 	EXPORT voxbloxTargets
 	LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
 	ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
