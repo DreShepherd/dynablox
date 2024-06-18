@@ -17,7 +17,9 @@ endif()
 #############
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 add_subdirectory(voxblox)
-list(APPEND CMAKE_PREFIX_PATH "${CMAKE_SOURCE_DIR}/build/voxblox")
+list(APPEND CMAKE_PREFIX_PATH "${CMAKE_CURRENT_BINARY_DIR}/voxblox")
+message("-------------------CMAKE_PREFIX_PATH----------------------")
+cmake_print_variables(CMAKE_PREFIX_PATH)
 
 find_package(PCL REQUIRED)
 find_package(Glog REQUIRED)
