@@ -161,15 +161,23 @@ void MapUpdater::saveMap(std::string const& folder_path) {
   pcl::PointCloud<PointType>::Ptr save_cloud;
   std::cout << std::endl;
   
-  LOG(INFO) << "Saving " << ANSI_MAGENTA "Clean Static map to " ANSI_RESET << folder_path
+  LOG(INFO) << "Saving Static map to " << folder_path
             << "\nPointcloud size: " << Static_Cloud_->points.size() << " points.";
   save_cloud = Static_Cloud_;
 
   if (save_cloud->points.size() > 0){
-    LOG(INFO) << "Saving folder: " << folder_path + "/dynablox_output.pcd";
-    pcl::io::savePCDFileBinary(folder_path + "/dynablox_output.pcd", *save_cloud);
+    LOG(INFO) << "Saving folder: " << folder_path + "/dynablox_output_static.pcd";
+    pcl::io::savePCDFileBinary(folder_path + "/dynablox_output_static.pcd", *save_cloud);
   }
-    
+  
+  LOG(INFO) << "Saving Dynamic map to " << folder_path
+                << "\nPointcloud size: " << Dynamic_Cloud_->points.size() << " points.";
+  save_cloud = Dynamic_Cloud_;
+
+  if (save_cloud->points.size() > 0) {
+        LOG(INFO) << "Saving folder: " << folder_path + "/dynablox_output_dynamic.pcd";
+        pcl::io::savePCDFileBinary(folder_path + "/dynablox_output_dynamic.pcd", *save_cloud);
+  }
 }
 
 void MapUpdater::Tracking(const Cloud& cloud, Clusters& clusters, CloudInfo& cloud_info) {
