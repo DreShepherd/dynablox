@@ -3,6 +3,7 @@
 
 #include <algorithm>
 #include <vector>
+#define M_PI 3.14159265358979323846
 
 #include "voxblox/core/color.h"
 #include "voxblox/core/common.h"
@@ -128,7 +129,7 @@ class ExponentialOffsetIdColorMap : IdColorMap {
  public:
   ExponentialOffsetIdColorMap() : items_per_revolution_(10u) {}
 
-  void setItemsPerRevolution(uint value) { items_per_revolution_ = value; }
+  void setItemsPerRevolution(uint32_t value) { items_per_revolution_ = value; }
 
   virtual Color colorLookup(const size_t value) const {
     const size_t revolution = value / items_per_revolution_;
@@ -158,5 +159,7 @@ class ExponentialOffsetIdColorMap : IdColorMap {
 };
 
 }  // namespace voxblox
+
+#undef M_PI
 
 #endif  // VOXBLOX_UTILS_COLOR_MAPS_H_

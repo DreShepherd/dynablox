@@ -26,7 +26,7 @@ int main(int argc, char** argv) {
   google::InitGoogleLogging(argv[0]);
   google::InstallFailureSignalHandler();
   FLAGS_colorlogtostderr = true;
-  google::SetStderrLogging(google::INFO);
+  google::SetStderrLogging(google::GLOG_INFO);
 
   if (argc < 3) {
       LOG(ERROR) << "Usage: " << argv[0] << " [pcd_folder] [config_file]";

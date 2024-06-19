@@ -165,7 +165,7 @@ class QuatTransformationTemplate {
   QuatTransformationTemplate<Scalar> inverse() const;
 
   /// \deprecated use inverse() instead.
-  QuatTransformationTemplate<Scalar> inverted() const __attribute__((deprecated));
+  QuatTransformationTemplate<Scalar> inverted() const;
 
   /// \brief check for binary equality.
   bool operator==(const QuatTransformationTemplate<Scalar>& rhs) const;

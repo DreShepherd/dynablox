@@ -27,7 +27,11 @@ set(CMAKE_BUILD_TYPE Release)
 set(CMAKE_MACOSX_RPATH 0)
 # recompile with -fPIC
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
-add_definitions(-std=c++14 -Wall -Wextra)
+# Set default compile flags for GCC
+if(CMAKE_COMPILER_IS_GNUCXX)
+    message(STATUS "GCC detected, adding compile flags")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14 -pedantic -Wall -Wextra")
+endif(CMAKE_COMPILER_IS_GNUCXX)
 
 # Compile protobuf files
 set(PROTO_DEFNS proto/voxblox/Block.proto
@@ -37,7 +41,7 @@ set(PROTOBUF_COMPILE_PYTHON true)
 protobuf_generate_cpp(PROTO_SRCS PROTO_HDRS ${PROTO_DEFNS})
 
 # Add voxblox library
-set(${PROJECT_NAME}_SRCS
+set(SRCS
   src/alignment/icp.cc
   src/core/block.cc
   src/core/esdf_map.cc
@@ -61,14 +65,14 @@ set(${PROJECT_NAME}_SRCS
   src/utils/voxel_utils.cc
 )
 
-add_library(${PROJECT_NAME} ${${PROJECT_NAME}_SRCS} ${PROTO_SRCS} ${PROTO_HDRS})
+add_library(${PROJECT_NAME} ${SRCS} ${PROTO_SRCS} ${PROTO_HDRS})
 target_include_directories(${PROJECT_NAME} PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/>
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src>
   $<INSTALL_INTERFACE:include/${PROJECT_NAME}>
 )
-
+target_compile_definitions(${PROJECT_NAME} PRIVATE -DGLOG_NO_ABBREVIATED_SEVERITIES)
 target_link_libraries(${PROJECT_NAME} ${Boost_LIBRARIES} Eigen3::Eigen  ${PCL_LIBRARIES} ${PROTOBUF_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
 
 # IDEs should put the headers in a nice place

@@ -117,7 +117,7 @@ class AngleAxisTemplate {
   AngleAxisTemplate<Scalar> inverse() const;
 
   /// \deprecated use inverse() instead.
-  AngleAxisTemplate<Scalar> inverted() const __attribute__((deprecated));
+  AngleAxisTemplate<Scalar> inverted() const;
 
   /// \brief rotate a vector, v.
   Vector3 rotate(const Vector3& v) const;

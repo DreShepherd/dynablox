@@ -24,12 +24,9 @@ void serializeDirection(const Eigen::Vector3i& parent_direction,
   // Serialization should never change the values, the parent values will either
   // need to be truncated in the ESDF integrator or we need to use more bytes to
   // serialize the ESDF voxel.
-  const int8_t parent_direction_x =
-      std::min(INT8_MAX, std::max(parent_direction.x(), INT8_MIN));
-  const int8_t parent_direction_y =
-      std::min(INT8_MAX, std::max(parent_direction.y(), INT8_MIN));
-  const int8_t parent_direction_z =
-      std::min(INT8_MAX, std::max(parent_direction.z(), INT8_MIN));
+  const int8_t parent_direction_x = std::min((int8_t)INT8_MAX, std::max((int8_t)parent_direction.x(), (int8_t)INT8_MIN));
+  const int8_t parent_direction_y = std::min((int8_t)INT8_MAX, std::max((int8_t)parent_direction.y(), (int8_t)INT8_MIN));
+  const int8_t parent_direction_z = std::min((int8_t)INT8_MAX, std::max((int8_t)parent_direction.z(), (int8_t)INT8_MIN));
 
   // Layout:
   // | 3x8bit (int8_t) for parent (X,Y,Z) | 8bit ESDF |

@@ -384,7 +384,7 @@ class Timing : public Timer
 		printf("%s%s%-*s\t%.*f\t%.*f\t%.*f\t%.*f\t%.*f\t%.*f\t%lu%s\n", bold ? "\033[1m" : "",
 		       random_colors ? RC[0] : color().c_str(), width[0], tag().c_str(), precision,
 		       totalSeconds(), precision, lastSeconds(), precision, meanSeconds(), precision,
-		       stdSeconds(), precision, minSeconds(), precision, maxSeconds(), numSamples(),
+		       stdSeconds(), precision, minSeconds(), precision, maxSeconds(), (unsigned long)numSamples(),
 		       resetColor());
 
 		std::size_t i{};
@@ -406,8 +406,8 @@ class Timing : public Timer
 			printf("%s%s%-*s\t%.*f\t%.*f\t%.*f\t%.*f\t%.*f\t%.*f\t%lu%s\n",
 			       bold ? "\033[1m" : "", random_colors ? RC[i % RC.size()] : t.color().c_str(),
 			       component_width, tag.c_str(), precision, t.totalSeconds(), precision,
-			       t.lastSeconds(), precision, t.meanSeconds(), precision, t.stdSeconds(),
-			       precision, t.minSeconds(), precision, t.maxSeconds(), t.numSamples(),
+			       t.lastSeconds(), precision, t.meanSeconds(), precision, t.stdSeconds(), precision, t.minSeconds(), precision, t.maxSeconds(),
+                               (unsigned long)t.numSamples(),
 			       resetColor());
 			t.printSecondsRecurs(level + 1, i, component_width, random_colors, bold,
 			                     group_colors_level, precision);
@@ -486,7 +486,7 @@ class Timing : public Timer
 
 	int longestSteps() const
 	{
-		int l = (std::isnan(numSamples())) ? nan_gap_ : std::to_string(static_cast<int>(numSamples())).length();
+		int l = (std::isnan((double)numSamples())) ? nan_gap_ : std::to_string(static_cast<int>(numSamples())).length();
 		// int l = std::to_string(numSamples()).length();
 		for (auto const& [_, t] : timer_) {
 			l = std::max(l, t.longestSteps());

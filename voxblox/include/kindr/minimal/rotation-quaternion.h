@@ -135,7 +135,7 @@ class RotationQuaternionTemplate {
   RotationQuaternionTemplate<Scalar> inverse() const;
 
   /// \deprecated use inverse instead.
-  RotationQuaternionTemplate<Scalar> inverted() const __attribute__((deprecated));
+  RotationQuaternionTemplate<Scalar> inverted() const;
 
   /// \brief get a copy of the conjugate of the quaternion.
   RotationQuaternionTemplate<Scalar> conjugated() const;

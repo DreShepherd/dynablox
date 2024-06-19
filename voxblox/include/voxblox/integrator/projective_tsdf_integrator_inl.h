@@ -8,6 +8,8 @@
 
 #include "voxblox/core/block.h"
 
+#define M_PI 3.14159265358979323846
+
 namespace voxblox {
 template <InterpolationScheme interpolation_scheme>
 ProjectiveTsdfIntegrator<interpolation_scheme>::ProjectiveTsdfIntegrator(
@@ -310,7 +312,7 @@ template <>
 inline float
 ProjectiveTsdfIntegrator<InterpolationScheme::kNearestNeighbor>::interpolate(
     const Eigen::MatrixXf &range_image, const float h, const float w) {
-  return range_image(std::round(h), std::round(w));
+  return range_image.coeff(std::round(h), std::round(w));
 }
 
 template <>
@@ -319,14 +321,14 @@ ProjectiveTsdfIntegrator<InterpolationScheme::kMinNeighbor>::interpolate(
     const Eigen::MatrixXf &range_image, const float h, const float w) {
   // TODO(victorr): Implement better edge handling
   if (h >= vertical_resolution_ || w >= horizontal_resolution_) {
-    return range_image(std::floor(h), std::floor(w));
+    return range_image.coeff(std::floor(h), std::floor(w));
   }
 
   const float min_neighbor =
       range_image.block<2, 2>(std::floor(h), std::floor(w)).minCoeff();
 
   if (min_neighbor < config_.min_ray_length_m) {
-    return range_image(std::round(h), std::round(w));
+    return range_image.coeff(std::round(h), std::round(w));
   } else {
     return min_neighbor;
   }
@@ -339,7 +341,7 @@ ProjectiveTsdfIntegrator<InterpolationScheme::kBilinear>::interpolate(
   // TODO(victorr): Implement better edge handling
   // Check if we're on the edge, to avoid out-of-bounds matrix access
   if (h >= vertical_resolution_ || w >= horizontal_resolution_) {
-    return range_image(std::floor(h), std::floor(w));
+    return range_image.coeff(std::floor(h), std::floor(w));
   }
 
   // Check if all of the neighbors are valid values
@@ -348,17 +350,16 @@ ProjectiveTsdfIntegrator<InterpolationScheme::kBilinear>::interpolate(
   if ((range_image.block<2, 2>(std::floor(h), std::floor(w)).array() <
        config_.min_ray_length_m)
           .any()) {
-    return range_image(std::round(h), std::round(w));
+    return range_image.coeff(std::round(h), std::round(w));
   }
 
   // TODO(victorr): Write this as a matrix
   float h_int, w_int;
   const float h_decimals = std::modf(h, &h_int);
   const float w_decimals = std::modf(w, &w_int);
-  const float left = (1 - h_decimals) * range_image(h_int, w_int) +
-                     h_decimals * range_image(h_int + 1, w_int);
-  const float right = (1 - h_decimals) * range_image(h_int, w_int + 1) +
-                      h_decimals * range_image(h_int + 1, w_int + 1);
+  const float left = (1 - h_decimals) * range_image.coeff(h_int, w_int) + h_decimals * range_image.coeff(h_int + 1, w_int);
+  const float right =
+      (1 - h_decimals) * range_image.coeff(h_int, w_int + 1) + h_decimals * range_image.coeff(h_int + 1, w_int + 1);
   return (1 - w_decimals) * left + w_decimals * right;
 }
 
@@ -368,7 +369,7 @@ ProjectiveTsdfIntegrator<InterpolationScheme::kAdaptive>::interpolate(
     const Eigen::MatrixXf &range_image, const float h, const float w) {
   // Check if we're on the edge, to avoid out-of-bounds matrix access
   if (h >= vertical_resolution_ || w >= horizontal_resolution_) {
-    return range_image(std::floor(h), std::floor(w));
+    return range_image.coeff(std::floor(h), std::floor(w));
   }
 
   // Get the bilinear interpolation coefficients
@@ -377,10 +378,10 @@ ProjectiveTsdfIntegrator<InterpolationScheme::kAdaptive>::interpolate(
   const float w_decimals = std::modf(w, &w_int);
 
   // Define easy to read names for all four range image pixels
-  const float top_left = range_image(h_int, w_int);
-  const float top_right = range_image(h_int, w_int + 1);
-  const float bottom_left = range_image(h_int + 1, w_int);
-  const float bottom_right = range_image(h_int + 1, w_int + 1);
+  const float top_left = range_image.coeff(h_int, w_int);
+  const float top_right = range_image.coeff(h_int, w_int + 1);
+  const float bottom_left = range_image.coeff(h_int + 1, w_int);
+  const float bottom_right = range_image.coeff(h_int + 1, w_int + 1);
 
   // Left column
   float bilinear_left, min_left;
@@ -447,5 +448,7 @@ ProjectiveTsdfIntegrator<InterpolationScheme::kAdaptive>::interpolate(
   }
 }
 }  // namespace voxblox
+
+#undef M_PI
 
 #endif  // VOXBLOX_INTEGRATOR_PROJECTIVE_TSDF_INTEGRATOR_INL_H_

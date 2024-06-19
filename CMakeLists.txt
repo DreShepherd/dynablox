@@ -39,7 +39,7 @@ set(FUN_LIB ${PCL_LIBRARIES} voxblox Eigen3::Eigen yaml-cpp)
 #############
 # LIBRARIES #
 #############
-add_library(dm_lib SHARED 
+add_library(dm_lib
             src/dynablox.cpp 
             src/clustering.cpp 
             src/TsdfMapper.cpp)
